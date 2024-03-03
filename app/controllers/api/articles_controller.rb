@@ -35,19 +35,17 @@ class Api::ArticlesController < ApplicationController
         if @article.save
             render json: { article: @article.to_custom_json }, status: :created
         else
-            render json: @article.errors, status: :unprocessable_entity
+            render json: @article.errors.full_messages, status: :unprocessable_entity
         end
     end
 
     # PUT /api/articles/:slug
     def update
-        pp @article.to_custom_json
         if @article.update(article_params)
             render json: { article: @article.to_custom_json }, status: :ok
         else
-            render json: @article.errors, status: :unprocessable_entity
+            render json: @article.errors.full_messages, status: :unprocessable_entity
         end
-
     end
 
     def destroy

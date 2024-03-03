@@ -2,8 +2,7 @@ class Article < ApplicationRecord
 
     self.primary_key = 'slug'
 
-    before_validation :generate_slug, if: -> { title.present? && slug.blank? }
-    before_validation :update_slug, if: -> { title_changed? && !new_record? }
+    before_save :generate_slug, if: -> { title.present? && slug.blank? }
 
     # def to_custom_json
     #     self.attributes.merge({                     # 記事オブジェクトの属性を含むハッシュを返します。これには、データベースの各列に対応する属性が含まれます（例: title、description、body、created_at、updated_atなど）。
@@ -15,7 +14,7 @@ class Article < ApplicationRecord
 
     def to_custom_json
         {
-            slug: self.slug || title.parameterize,
+            slug: self.slug,
             title: self.title,
             description: self.description,
             body: self.body,
@@ -25,15 +24,7 @@ class Article < ApplicationRecord
     end
 
     def generate_slug
-        self.slug = title.parameterize
+        self.slug = self.title.parameterize
     end
 
-    def update_slug
-        new_slug = title.parameterize
-        if self.class.exists?(slug: new_slug) && self.slug != new_slug
-            errors.add(:title, "has already been taken")
-        else
-            self.slug = new_slug
-        end
-    end
 end
